@@ -11,7 +11,7 @@
         color: white;
         font-family: Arial, sans-serif;
         text-align: center;
-        overflow: hidden;
+        overflow-x: hidden;
     }
     canvas {
         position: fixed;
@@ -21,7 +21,8 @@
     }
     .container {
         margin-top: 80px;
-        max-width: 90%;
+        padding: 0 15px;
+        max-width: 600px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -30,20 +31,22 @@
         border-radius: 6px;
         border: none;
         outline: none;
-        width: 300px;
+        width: 100%;
         font-size: 1rem;
         text-align: center;
+        margin-bottom: 10px;
     }
     button {
         background: #00a8ff;
         color: white;
         padding: 12px 20px;
-        margin: 10px 5px;
+        margin: 5px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
         font-size: 1rem;
         transition: 0.3s;
+        width: 48%;
     }
     button:hover {
         background: #33ccff;
@@ -57,6 +60,13 @@
         font-family: monospace;
         word-break: break-all;
         display: inline-block;
+        max-width: 100%;
+        cursor: text;
+    }
+    @media (max-width: 500px) {
+        button {
+            width: 100%;
+        }
     }
 </style>
 </head>
@@ -65,14 +75,20 @@
 <canvas id="bgCanvas"></canvas>
 
 <div class="container">
-    <h1>! Vextroz link - hider</h1>
+    <h1>! Vextroz Link Hider</h1>
     <input id="urlInput" placeholder="Paste your Roblox-like link here">
-    <button onclick="maskLink()">Generate</button>
-    <button onclick="copyOutput()">Copy</button>
+    <div>
+        <button onclick="maskLink()">Generate</button>
+        <button onclick="copyOutput()">Copy</button>
+    </div>
     <div class="output" id="outputBox"></div>
 </div>
 
 <script>
+function formatMasked(url) {
+    return `[${url.replace(':', '__:__')}](short-url-here)`;
+}
+
 function maskLink() {
     let input = document.getElementById("urlInput").value.trim();
     if (!input) {
@@ -85,25 +101,29 @@ function maskLink() {
         let pathParts = url.pathname.split('/').filter(Boolean);
         let masked = "";
 
-        // Profile link: /users/{id}/profile
+        // Profile link
         if (pathParts[0] === "users" && pathParts[2] === "profile") {
-            masked = `[https://www.roblox.com/users/${pathParts[1]}/profile](shorten url)`;
+            masked = formatMasked(`https://www.roblox.com/users/${pathParts[1]}/profile`);
         } 
-        // Share type: /share?code=...&type=Server
-        else if (url.pathname.startsWith("/share") && url.searchParams.has("code") && url.searchParams.get("type") === "Server") {
-            masked = `[https://www.roblox.com/share?code=${url.searchParams.get("code")}&type=Server](shorten url)`;
+        // Share server link
+        else if (url.pathname.startsWith("/share") && url.searchParams.has("code")) {
+            masked = formatMasked(`https://www.roblox.com/share?code=${url.searchParams.get("code")}&type=Server`);
         } 
-        // Private server in games: /games/{gameId}/{name}?privateServerLinkCode=...
+        // Private server in games (old style)
         else if (pathParts[0] === "games" && url.searchParams.has("privateServerLinkCode")) {
-            masked = `[https://www.roblox.com/games/${pathParts[1]}/${pathParts[2]}?privateServerLinkCode=${url.searchParams.get("privateServerLinkCode")}](shorten url)`;
+            masked = formatMasked(`https://www.roblox.com/share?code=${url.searchParams.get("privateServerLinkCode")}&type=Server`);
         }
-        // Community/group type
+        // Normal game link
+        else if (pathParts[0] === "games" && pathParts[1]) {
+            masked = formatMasked(`https://www.roblox.com/games/${pathParts[1]}/${pathParts[2] || ''}`);
+        }
+        // Community
         else if (pathParts[0] === "communities" && pathParts[2] === "Community") {
-            masked = `[https://www.roblox.com/communities/${pathParts[1]}/Community](shorten url)`;
+            masked = formatMasked(`https://www.roblox.com/communities/${pathParts[1]}/Community`);
         } 
-        // Old style group
+        // Group
         else if (pathParts[0] === "groups" && pathParts[1]) {
-            masked = `[https://www.roblox.com/groups/${pathParts[1]}](shorten url)`;
+            masked = formatMasked(`https://www.roblox.com/groups/${pathParts[1]}`);
         } 
         else {
             masked = "Could not detect type from link!";
@@ -128,10 +148,10 @@ function copyOutput() {
     });
 }
 
-// Background comet animation
+// Background snow animation
 const canvas = document.getElementById("bgCanvas");
 const ctx = canvas.getContext("2d");
-let particles = [];
+let snowflakes = [];
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -140,41 +160,45 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-function createParticle() {
+function createSnowflake() {
     return {
         x: Math.random() * canvas.width,
-        y: -10,
-        length: Math.random() * 20 + 10,
-        speed: Math.random() * 2 + 1,
-        opacity: Math.random() * 0.5 + 0.5
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 1,
+        speedY: Math.random() * 1 + 0.5
     };
 }
 
-for (let i = 0; i < 50; i++) {
-    particles.push(createParticle());
+function initSnow() {
+    snowflakes = [];
+    for (let i = 0; i < 100; i++) {
+        snowflakes.push(createSnowflake());
+    }
 }
 
-function drawParticles() {
+function drawSnow() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-        ctx.beginPath();
-        const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.length);
-        grad.addColorStop(0, `rgba(0,168,255,${p.opacity})`);
-        grad.addColorStop(1, 'transparent');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.x, p.y + p.length);
-        ctx.stroke();
+    ctx.fillStyle = "#33ccff";
+    ctx.beginPath();
+    snowflakes.forEach(flake => {
+        ctx.moveTo(flake.x, flake.y);
+        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+    });
+    ctx.fill();
 
-        p.y += p.speed;
-        if (p.y > canvas.height) {
-            Object.assign(p, createParticle());
+    snowflakes.forEach(flake => {
+        flake.y += flake.speedY;
+        if (flake.y > canvas.height) {
+            flake.x = Math.random() * canvas.width;
+            flake.y = 0;
         }
     });
-    requestAnimationFrame(drawParticles);
+
+    requestAnimationFrame(drawSnow);
 }
-drawParticles();
+
+initSnow();
+drawSnow();
 </script>
 
 </body>
