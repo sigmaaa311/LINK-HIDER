@@ -1,510 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="https://api.injuries.lu/favicon.ico" type="image/x-icon">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VEXIFIED | HYPERLINK</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --black: #000000;
-      --white: #FFFFFF;
-      --gray-dark: #1a1a1a;
-      --gray-light: #333333;
-      --accent: #ff4d4d;
-      --blue: #ff4d4d;
-      --purple: #ff6666;
-    }
-    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEXIFIED | Roblox Link Hider</title>
+<style>
     body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: var(--black);
-      color: var(--white);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      overflow-x: hidden;
-      opacity: 0;
-      animation: fadeIn 1s ease-in-out forwards;
+        margin: 0;
+        background: black;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        overflow: hidden;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
     }
-
-    /* Floating animation for title */
-    @keyframes float {
-      0% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-12px);
-      }
-      100% {
-        transform: translateY(0px);
-      }
-    }
-
-    #bg-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
     .container {
-      background: rgba(26, 26, 26, 0.9);
-      border-radius: 16px;
-      padding: 40px;
-      width: 100%;
-      max-width: 500px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
-      border: 1px solid #ff4d4d;
-      position: relative;
-      z-index: 10;
-      backdrop-filter: blur(20px);
-      margin: 20px 0;
-      transition: all 0.3s ease;
+        margin-top: 80px;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
     }
-
-    .container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 25px 50px rgba(255, 77, 77, 0.2);
+    input {
+        padding: 12px;
+        border-radius: 6px;
+        border: none;
+        outline: none;
+        width: 300px;
+        font-size: 1rem;
+        text-align: center;
     }
-
-    h1 {
-      color: var(--accent);
-      text-align: center;
-      margin: 0 0 30px 0;
-      font-weight: 700;
-      font-size: 2.2rem;
-      letter-spacing: 2px;
-      position: relative;
-      padding-bottom: 15px;
-      text-transform: uppercase;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .button-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .button-row a {
-      flex: 1;
-      transition: all 0.3s ease;
-    }
-
-    label {
-      display: block;
-      margin: 20px 0 10px;
-      color: #ff8888;
-      font-weight: 500;
-      font-size: 0.9rem;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-    }
-
-    label:hover {
-      color: var(--accent);
-      transform: translateX(5px);
-    }
-
-    .custom-select {
-      position: relative;
-      width: 100%;
-      margin: 20px 0;
-      transition: all 0.3s ease;
-    }
-
-    .custom-select:hover {
-      transform: translateY(-2px);
-    }
-
-    .custom-select select {
-      width: 100%;
-      padding: 14px 20px;
-      border: 1px solid #ff4d4d;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      background: rgba(26, 26, 26, 0.8);
-      color: var(--white);
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .custom-select select:hover, .custom-select select:focus {
-      border-color: #ff6666;
-      box-shadow: 0 5px 15px rgba(255, 77, 77, 0.3);
-      outline: none;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 14px 20px;
-      border: 1px solid #ff4d4d;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      background: rgba(26, 26, 26, 0.8);
-      color: var(--white);
-      font-family: 'Inter', sans-serif;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      box-sizing: border-box;
-    }
-
-    input[type="text"]:hover, input[type="text"]:focus {
-      border-color: #ff6666;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 77, 77, 0.3);
-      outline: none;
-    }
-
-    button, .community-button, .beaming-sites-button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      text-align: center;
-      display: block;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      text-decoration: none;
-    }
-
-    button:hover, .community-button:hover, .beaming-sites-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(255, 77, 77, 0.4);
-    }
-
-    button:active, .community-button:active, .beaming-sites-button:active {
-      transform: translateY(1px);
-    }
-
     button {
-      background: var(--accent);
-      color: var(--white);
-      margin: 15px 0;
+        background: #00a8ff;
+        color: white;
+        padding: 12px 20px;
+        margin: 10px 5px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.3s;
     }
-
-    .community-button {
-      background: var(--accent);
-      color: var(--white);
+    button:hover {
+        background: #33ccff;
+        box-shadow: 0 0 10px #33ccff;
     }
-
-    .beaming-sites-button {
-      background: #ff6666;
-      color: var(--white);
-    }
-
     .output {
-      margin-top: 25px;
-      padding: 20px;
-      background: rgba(26, 26, 26, 0.6);
-      border-radius: 12px;
-      border: 1px solid #ff4d4d;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
-      line-height: 1.6;
-      min-height: 100px;
-      transition: all 0.5s ease;
-      backdrop-filter: blur(10px);
+        margin-top: 20px;
+        background: rgba(255,255,255,0.1);
+        padding: 10px;
+        border-radius: 6px;
+        font-family: monospace;
+        word-break: break-all;
+        display: inline-block;
     }
-
-    .brand {
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--accent);
-      z-index: 20;
-      transition: all 0.3s ease;
-      font-family: 'Orbitron', sans-serif;
-      text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
-    }
-
-    .brand:hover {
-      transform: scale(1.05);
-      text-shadow: 0 0 15px rgba(255, 77, 77, 0.8);
-    }
-
-    .back-button {
-      position: absolute;
-      top: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 77, 77, 0.1);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 10px 20px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-family: 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      z-index: 20;
-    }
-
-    .back-button:hover {
-      background: rgba(255, 77, 77, 0.2);
-      transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 5px 15px rgba(255, 77, 77, 0.3);
-    }
-
-    @media (max-width: 500px) {
-      .button-row {
-        flex-direction: column;
-      }
-      
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .container {
-        padding: 30px 20px;
-      }
-    }
-  </style>
+</style>
 </head>
 <body>
-  <canvas id="bg-canvas"></canvas>
-  
-  <div class="brand">VEXIFIED</div>
-  
-  <div class="container">
-    <h1>VEXIFIED | HYPERLINK</h1>
-    
-    <div class="button-row">
-      <a href="https://fantasysites.netlify.app" target="_blank" class="beaming-sites-button">BEST SITES</a>
-    </div>
-    
-    <label for="url">URL to shorten:</label>
-    <input type="text" id="url" placeholder="https://example.com">
-    
-    <label for="format">Link type:</label>
-    <div class="custom-select">
-      <select id="format">
-        <option value="profile">Profile Link</option>
-        <option value="private-server">Private Server</option>
-        <option value="group">Group/Community</option>
-      </select>
-    </div>
-    
-    <button onclick="generateLink()">Format for Discord</button>
-    
-    <div class="output" id="output"></div>
-  </div>
 
-  <script>
-    // Connected dots network background
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-    
-    const spacing = 120;
-    const points = [];
-    
-    // Create grid of connected points
-    for (let x = 0; x <= width; x += spacing) {
-      for (let y = 0; y <= height; y += spacing) {
-        points.push({
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3
-        });
-      }
-    }
-    
-    function animate() {
-      // Create fade trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-      ctx.fillRect(0, 0, width, height);
-      
-      // Draw connections between nearby points
-      for (let i = 0; i < points.length; i++) {
-        const p1 = points[i];
-        for (let j = i + 1; j < points.length; j++) {
-          const p2 = points[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          if (dist < 150) {
-            const opacity = (1 - dist / 150) * 0.6;
-            ctx.strokeStyle = `rgba(255, 77, 77, ${opacity})`;
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
-      }
-      
-      // Draw points
-      points.forEach(p => {
-        ctx.fillStyle = 'rgba(255, 77, 77, 0.8)';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Add glow effect to points
-        ctx.fillStyle = 'rgba(255, 77, 77, 0.3)';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Move points
-        p.x += p.vx;
-        p.y += p.vy;
-        
-        // Bounce off edges
-        if (p.x <= 0 || p.x >= width) p.vx *= -1;
-        if (p.y <= 0 || p.y >= height) p.vy *= -1;
-      });
-      
-      requestAnimationFrame(animate);
-    }
-    
-    window.addEventListener('resize', () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    });
-    
-    async function shortenUrl(longUrl) {
-      if (!longUrl) return longUrl;
-      
-      // Ensure URL has proper protocol
-      if (!longUrl.match(/^https?:\/\//)) {
-        longUrl = 'https://' + longUrl;
-      }
-      
-      try {
-        // First try with JSON API
-        const jsonResponse = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
-        
-        if (jsonResponse.ok) {
-          const jsonData = await jsonResponse.json();
-          
-          // Check for API errors in JSON response
-          if (jsonData.errorcode) {
-            throw new Error(jsonData.errormessage || 'API error');
-          }
-          
-          if (jsonData.shorturl && jsonData.shorturl.startsWith('http')) {
-            return jsonData.shorturl;
-          }
-        }
-        
-        // If JSON fails, try simple format as fallback
-        const simpleResponse = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`);
-        
-        if (simpleResponse.ok) {
-          const simpleUrl = await simpleResponse.text();
-          
-          // Validate simple response
-          if (simpleUrl.startsWith('http')) {
-            return simpleUrl;
-          } else if (simpleUrl.startsWith('Error:')) {
-            throw new Error(simpleUrl);
-          }
-        }
-        
-        throw new Error('No valid response from API');
-        
-      } catch (error) {
-        console.error('URL shortening failed:', error);
-        return longUrl; // Return original if shortening fails
-      }
-    }
-    
-    async function generateLink() {
-      const url = document.getElementById('url').value.trim();
-      if (!url) {
-        alert('Please enter a URL');
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+    <h1>! Vextroz link - hider</h1>
+    <input id="urlInput" placeholder="Paste your Roblox-like link here">
+    <button onclick="maskLink()">Generate</button>
+    <button onclick="copyOutput()">Copy</button>
+    <div class="output" id="outputBox"></div>
+</div>
+
+<script>
+function maskLink() {
+    let input = document.getElementById("urlInput").value.trim();
+    if (!input) {
+        alert("Please paste a link first!");
         return;
-      }
-      
-      const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = '<p>Shortening URL...</p>';
-      outputDiv.style.opacity = '0';
-      outputDiv.style.transform = 'translateY(20px)';
-      
-      try {
-        const shortUrl = await shortenUrl(url);
-        const format = document.getElementById('format').value;
-        
-        let prefix;
-        switch(format) {
-          case 'profile':
-            prefix = '[https__:__//www.roblox.com/users/6700452/profile]';
-            break;
-          case 'private-server':
-            prefix = '[https_:_//www.roblox.com/share?code=9b3bf13e5fe0894d941ac87ac52f8d1d&type=Server]';
-            break;
-          case 'group':
-            prefix = '[https__:__//www.roblox.com/groups/7429401045]';
-            break;
-          default:
-            prefix = '[Link]';
-        }
-        
-        const formattedLink = `${prefix}(${shortUrl})`;
-        
-        setTimeout(() => {
-          outputDiv.style.opacity = '1';
-          outputDiv.style.transform = 'translateY(0)';
-          outputDiv.innerHTML = `
-            <p><strong>Your Discord Hyperlink:</strong></p>
-            <p style="word-break: break-all; color: #ff8888;">${formattedLink}</p>
-            <p><small style="color: #ff6666;">Copied to clipboard!</small></p>
-          `;
-        }, 300);
-        
-        try {
-          await navigator.clipboard.writeText(formattedLink);
-        } catch (err) {
-          console.error('Failed to copy:', err);
-          outputDiv.innerHTML += `<p><small style="color: #ff6666;">Please copy manually</small></p>`;
-        }
-      } catch (error) {
-        outputDiv.innerHTML = `<p style="color: #ff6666;">Error: ${error.message}</p>`;
-        outputDiv.style.opacity = '1';
-        outputDiv.style.transform = 'translateY(0)';
-      }
     }
-    
-    // Initialize everything
-    animate();
-    
-    // Auto-focus URL input on load
-    document.getElementById('url').focus();
-  </script>
+
+    try {
+        let url = new URL(input);
+        let pathParts = url.pathname.split('/').filter(Boolean);
+        let masked = "";
+
+        // Profile link: /users/{id}/profile
+        if (pathParts[0] === "users" && pathParts[2] === "profile") {
+            masked = `[https://www.roblox.com/users/${pathParts[1]}/profile](shorten url)`;
+        } 
+        // Share type: /share?code=...&type=Server
+        else if (url.pathname.startsWith("/share") && url.searchParams.has("code") && url.searchParams.get("type") === "Server") {
+            masked = `[https://www.roblox.com/share?code=${url.searchParams.get("code")}&type=Server](shorten url)`;
+        } 
+        // Private server in games: /games/{gameId}/{name}?privateServerLinkCode=...
+        else if (pathParts[0] === "games" && url.searchParams.has("privateServerLinkCode")) {
+            masked = `[https://www.roblox.com/games/${pathParts[1]}/${pathParts[2]}?privateServerLinkCode=${url.searchParams.get("privateServerLinkCode")}](shorten url)`;
+        }
+        // Community/group type
+        else if (pathParts[0] === "communities" && pathParts[2] === "Community") {
+            masked = `[https://www.roblox.com/communities/${pathParts[1]}/Community](shorten url)`;
+        } 
+        // Old style group
+        else if (pathParts[0] === "groups" && pathParts[1]) {
+            masked = `[https://www.roblox.com/groups/${pathParts[1]}](shorten url)`;
+        } 
+        else {
+            masked = "Could not detect type from link!";
+        }
+
+        document.getElementById("outputBox").textContent = masked;
+    } catch (err) {
+        document.getElementById("outputBox").textContent = "Invalid URL format!";
+    }
+}
+
+function copyOutput() {
+    let text = document.getElementById("outputBox").textContent;
+    if (!text || text.includes("Could not")) {
+        alert("No valid link to copy!");
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Copied to clipboard!");
+    }).catch(() => {
+        alert("Copy failed. Please copy manually.");
+    });
+}
+
+// Background comet animation
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function createParticle() {
+    return {
+        x: Math.random() * canvas.width,
+        y: -10,
+        length: Math.random() * 20 + 10,
+        speed: Math.random() * 2 + 1,
+        opacity: Math.random() * 0.5 + 0.5
+    };
+}
+
+for (let i = 0; i < 50; i++) {
+    particles.push(createParticle());
+}
+
+function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+        ctx.beginPath();
+        const grad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.length);
+        grad.addColorStop(0, `rgba(0,168,255,${p.opacity})`);
+        grad.addColorStop(1, 'transparent');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x, p.y + p.length);
+        ctx.stroke();
+
+        p.y += p.speed;
+        if (p.y > canvas.height) {
+            Object.assign(p, createParticle());
+        }
+    });
+    requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+
 </body>
 </html>
